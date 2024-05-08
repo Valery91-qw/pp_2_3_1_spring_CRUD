@@ -1,46 +1,54 @@
 package hiber.dao;
 
 import hiber.models.User;
-import org.hibernate.SessionFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.transaction.Transactional;
 import java.util.List;
+import java.util.Objects;
 
 @Repository
+@Transactional
 public class UserDaoImp implements UserDao {
 
-   @Autowired
-   private SessionFactory sessionFactory;
+   @PersistenceContext
+   private EntityManager entityManager;
 
+   @Transactional
    @Override
    public void add(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'add'");
+      entityManager.persist(user);
+      entityManager.flush();
    }
 
    @Override
-   public User get() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'get'");
+   public User get(Long id) {
+      User user = entityManager.find(User.class, id);
+      entityManager.flush();
+      return user;
    }
 
    @Override
-   public User update(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'update'");
+   public void update(User user) {
+      entityManager.merge(user);
+      entityManager.flush();
    }
 
    @Override
    public void delete(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'delete'");
+      user = entityManager.merge(user);
+      entityManager.remove(user);
+      entityManager.flush();
    }
 
    @Override
+   @SuppressWarnings("unchecked")
    public List<User> listUsers() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'listUsers'");
+      List<User> users = entityManager.createQuery("from User").getResultList();
+      entityManager.flush();
+      return users;
    }
 
 }

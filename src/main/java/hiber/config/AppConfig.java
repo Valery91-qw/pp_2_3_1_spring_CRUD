@@ -7,8 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import hiber.models.User;
@@ -37,24 +41,32 @@ public class AppConfig {
    }
 
    @Bean
-   public LocalSessionFactoryBean getSessionFactory() {
-      LocalSessionFactoryBean factoryBean = new LocalSessionFactoryBean();
-      factoryBean.setDataSource(getDataSource());
-      
-      Properties props=new Properties();
+   public Properties getHibernateProperties() {
+      Properties props = new Properties();
       props.put("hibernate.dialect", env.getProperty("hibernate.dialect"));
       props.put("hibernate.show_sql", env.getProperty("hibernate.show_sql"));
       props.put("hibernate.hbm2ddl.auto", env.getProperty("hibernate.hbm2ddl.auto"));
 
-      factoryBean.setHibernateProperties(props);
-      factoryBean.setAnnotatedClasses(User.class);
+      return props;
+   }
+
+   @Bean
+   public LocalContainerEntityManagerFactoryBean getEntityManagerFactory() {
+      final LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
+      final HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+
+      factoryBean.setDataSource(getDataSource());
+      factoryBean.setJpaVendorAdapter(vendorAdapter);
+      factoryBean.setPackagesToScan("hiber.models");
+      factoryBean.setJpaProperties(getHibernateProperties());
+
       return factoryBean;
    }
 
    @Bean
-   public HibernateTransactionManager getTransactionManager() {
-      HibernateTransactionManager transactionManager = new HibernateTransactionManager();
-      transactionManager.setSessionFactory(getSessionFactory().getObject());
+   public JpaTransactionManager getTransactionManager() {
+      JpaTransactionManager transactionManager = new JpaTransactionManager();
+      transactionManager.setEntityManagerFactory(getEntityManagerFactory().getObject());
       return transactionManager;
    }
 }

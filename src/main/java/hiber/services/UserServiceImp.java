@@ -16,33 +16,26 @@ public class UserServiceImp implements UserService {
 
    @Override
    public void create(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'create'");
+      userDao.add(user);
    }
 
    @Override
-   public User get() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'get'");
+   public User get(long id) {
+      return userDao.get(id);
    }
 
    @Override
-   public User update(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'update'");
+   public void update(User user) {
+       userDao.update(user);
    }
 
    @Override
    public void delete(User user) {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'delete'");
+      userDao.delete(user);
    }
 
    @Override
    public List<User> listUsers() {
-      // TODO Auto-generated method stub
-      throw new UnsupportedOperationException("Unimplemented method 'listUsers'");
+      return userDao.listUsers();
    }
-
-   
 }
